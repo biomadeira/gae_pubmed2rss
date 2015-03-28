@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
----------
-config.py
----------
+--------
+tools.py
+--------
 This defines the methods that implement routines used in the api.
 .. moduleauthor:: Fabio Madeira
 :module_version: 1.0
@@ -13,7 +13,6 @@ This defines the methods that implement routines used in the api.
 
 from __future__ import print_function
 
-import os
 import urllib
 import urllib2
 import feedparser
@@ -29,12 +28,12 @@ def request_url(url, list_iter=True, verbose=False):
 
     if req.getcode() == 200:
         return req
-    elif req.getcode() == 429: # or req.status_code == 503 or req.status_code == 504:
+    elif req.getcode() == 429: # or req.getcode() == 503 or req.getcode() == 504:
         request_url(url, list_iter=list_iter, verbose=verbose)
     else:
-        # message = "%s\t%s" % (req.status_code, url)
+        # message = "%s\t%s" % (req.getcode()ß, url)
         # TODO: add logging
-        return None
+        return 0
 
 
 def post_url(url, data, verbose=False):
@@ -46,9 +45,9 @@ def post_url(url, data, verbose=False):
     if req.getcode() == 200:
         return req
     else:
-        # message = "%s\t%s" % (req.status_code, url)
+        # message = "%s\t%s" % (req.getcode(), url)
         # TODO: add logging
-        return None
+        return 0
 
 
 def generate_rss_from_pubmed(input_string, feeds=50):
@@ -56,15 +55,13 @@ def generate_rss_from_pubmed(input_string, feeds=50):
     input_string = urllib.quote_plus(input_string)
     pubmed_url = conf("pubmed_search")
     url = "{}?term={}".format(pubmed_url, input_string)
-    # url = urllib.urlencode(url)
     read = request_url(url, list_iter=False, verbose=False)
 
-    if read is not None:
+    if read:
         # parse info from the response html - quick and dirty
         hid = ''
         qk = ''
         line = read.read()
-        # print(line)
         # the field to parse is the HID and qk
         if 'data-hid="' in line:
             hid = line.split('data-hid="')[1]
@@ -82,7 +79,7 @@ def generate_rss_from_pubmed(input_string, feeds=50):
                     'HID': hid}
         dataload = urllib.urlencode(dataload)
         read = post_url(pubmed_url, dataload, verbose=False)
-        if read is not None:
+        if read:
             rss_guid = ''
             line = read.read()
             # the field to parse is rss_guid
@@ -91,12 +88,9 @@ def generate_rss_from_pubmed(input_string, feeds=50):
                 rss_guid = rss_guid.split("'")[0]
             # parse the rss feed generated
             url = "{}erss.cgi?rss_guid={}".format(conf("pubmed_rss"), rss_guid)
-            print(url)
             return url
 
             # feed = feedparser.parse(url)
-            # # print(feed.keys())
-            # print(feed)
             # for entry in feed["entries"]:
             #     title = entry["title"]
             #     id = entry["id"]

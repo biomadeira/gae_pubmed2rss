@@ -35,7 +35,7 @@ def load_config(option):
         filename = "{}/{}".format(os.getcwd(), CONFIG_FILE)
         parser.read(filename)
 
-        # addresses paths
+        # addresses
         if option == "pubmed_search":
             return parser.get('Addresses', 'pubmed_search')
         elif option == "pubmed_rss":

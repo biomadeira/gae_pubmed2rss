@@ -24,11 +24,13 @@ def search_pubmed(string):
         page_not_found(404)
 
 
+@app.route('/rss/pubmed/<string>')
+@app.route('/rss/pubmed/string=<string>')
 @app.route('/rss/pubmed/<string>&<feeds>')
 @app.route('/rss/pubmed/<feeds>&<string>')
 @app.route('/rss/pubmed/string=<string>&feeds=<feeds>')
 @app.route('/rss/pubmed/feeds=<feeds>&string=<string>')
-def rss_pubmed(string, feeds):
+def rss_pubmed(string, feeds=50):
     """Generate a rss feed from Pubmed - based on the main page search."""
 
     if string:
