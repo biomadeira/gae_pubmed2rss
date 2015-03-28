@@ -1,0 +1,4 @@
+[Addresses]
+pubmed_search = http://www.ncbi.nlm.nih.gov/pubmed/
+pubmed_rss = http://www.ncbi.nlm.nih.gov/entrez/eutils/
+pubmed_eutils = http://eutils.ncbi.nlm.nih.gov/entrez/eutils/
