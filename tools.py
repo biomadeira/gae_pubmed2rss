@@ -16,12 +16,19 @@ from __future__ import print_function
 import urllib
 import urllib2
 import feedparser
+import bitly_api
+import tweepy
 
 from config import load_config as conf
 
+from models import FeedItem, FeedConsume
+from google.appengine.ext import ndb
+
+from config import TwitterKey, BitlyKey
+
 
 def request_url(url, list_iter=True, verbose=False):
-
+    """Generic url request method."""
     req = urllib2.urlopen(url)
     if verbose:
         print(req.getcode(), req.geturl())
@@ -37,6 +44,7 @@ def request_url(url, list_iter=True, verbose=False):
 
 
 def post_url(url, data, verbose=False):
+    """Generic url post method."""
 
     req = urllib2.urlopen(url, data)
     if verbose:
@@ -51,7 +59,7 @@ def post_url(url, data, verbose=False):
 
 
 def generate_rss_from_pubmed(input_string, feeds=50):
-
+    """Returns the url of a rss generated at Pubmed by the queried string."""
     input_string = urllib.quote_plus(input_string)
     pubmed_url = conf("pubmed_search")
     url = "{}?term={}".format(pubmed_url, input_string)
@@ -86,18 +94,73 @@ def generate_rss_from_pubmed(input_string, feeds=50):
             if "rss_guid=" in line:
                 rss_guid = line.split("rss_guid=")[2]
                 rss_guid = rss_guid.split("'")[0]
-            # parse the rss feed generated
-            url = "{}erss.cgi?rss_guid={}".format(conf("pubmed_rss"), rss_guid)
-            return url
+            # url = "{}erss.cgi?rss_guid={}".format(conf("pubmed_rss"), rss_guid)
+            return rss_guid
 
-            # feed = feedparser.parse(url)
-            # for entry in feed["entries"]:
-            #     title = entry["title"]
-            #     id = entry["id"]
-            #     print(title, id)
-            #     # break
+        else:
+            return 0
+    else:
+        return 0
 
+
+def twitter_bot(rss_guid=None):
+    """
+    Consumes a feed and checks if there are new entries in db.
+    If so, gets a shortened url and tweets the new status.
+    """
+
+    if rss_guid is None:
+        ancestor_key = ndb.Key("RSS_GUID", rss_guid or "*norss*")
+        consumer = FeedConsume.get_last_rss_guid(ancestor_key)
+        rss_guid = consumer[0].rss_guid
+    else:
+        consumer = FeedConsume(parent=ndb.Key("RSS_GUID", rss_guid or "*norss*"),
+                               rss_guid=rss_guid)
+        consumer.put()
+
+    url = "{}erss.cgi?rss_guid={}".format(conf("pubmed_rss"), rss_guid)
+    feeds = feedparser.parse(url)
+    for feed in feeds["items"]:
+        pmid = (feed["link"].split("/")[-1]).rstrip("?dopt=Abstract")
+        query = FeedItem.gql("WHERE pmid = :1", pmid)
+         # if pmid not in db
+        if (query.count() == 0):
+            title = feed["title"]
+            url = feed["link"]
+            category = feed["category"]
+            item = FeedItem()
+            item.pmid = pmid
+            item.put()
+
+            # shorten the url with Bitly.com
+            conn = bitly_api.Connection(login=None,
+                                        api_key=BitlyKey["client_id"],
+                                        access_token=BitlyKey["access_token"],
+                                        secret=BitlyKey["client_secret"])
+            shorturl = conn.shorten(url)["url"]
+            # tweet the new entry
+            max_length = (140 - len(category) - len(shorturl) - 7)
+            if len(title) > max_length:
+                title = title[0:max_length]
+            status = "#{}: {}... {}".format("".join(category.split()), title.rstrip("."), shorturl)
+            try:
+                status = unicode(status).encode("utf-8")
+            except UnicodeEncodeError:
+                pass
+                # TODO: add logging
+            auth = tweepy.OAuthHandler(TwitterKey['consumer_key'], TwitterKey['consumer_secret'])
+            auth.set_access_token(TwitterKey['access_token'], TwitterKey['access_token_secret'])
+            bot = tweepy.API(auth)
+            bot.update_status(status=status)
+    return "Done"
 
 if __name__ == '__main__':
     # testing routines
-    generate_rss_from_pubmed('"PLoS Comput Biol."[jour]')
+    # example_url = generate_rss_from_pubmed('"PLoS Comput Biol."[jour]')
+
+    # ALl new entries from 01/04/2015
+    # example_url = "http://www.ncbi.nlm.nih.gov/entrez/eutils/erss.cgi?rss_guid=1z3zFLTMk-jx9dXqtE4SfGE05yDieJhVzE72yLMWr0JyN7xEQ0"
+    # fee_a_bot(example_url)
+    # PlosOne example
+    example_rss_guid = "1vMcRd_vquRX1CBvT4N0TK0nWJfp2afjnnSfhZ6IFOQwlrgkoj"
+    twitter_bot(example_rss_guid)

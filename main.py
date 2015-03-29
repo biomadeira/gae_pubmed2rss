@@ -5,13 +5,15 @@ app.config['DEBUG'] = True
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
 
+from flask import render_template
+
 from tools import *
 
 
 @app.route('/')
 def hello():
-    """Return a friendly HTTP greeting."""
-    return 'Hello World Papers et al.!'
+    """Renders a simple api doc with the implemented methods."""
+    return render_template("api.html")
 
 
 @app.route('/search/pubmed/<string>')
@@ -19,6 +21,7 @@ def search_pubmed(string):
     """Return output from Pubmed - based on eutils API."""
 
     if string:
+
         return '%s' % string
     else:
         page_not_found(404)
@@ -38,6 +41,19 @@ def rss_pubmed(string, feeds=50):
         return '%s' % rss_url
     else:
         page_not_found(404)
+
+
+
+@app.route('/twitter_bot')
+@app.route('/twitter_bot&<rss_guid>')
+@app.route('/twitter_bot&rss_guid=<rss_guid>')
+def bot(rss_guid=None):
+    """
+    Consumes a feed and checks if there are new entries in db.
+    If so, gets a shortened url and tweets the new status.
+    """
+
+    return twitter_bot(rss_guid=rss_guid)
 
 
 @app.errorhandler(404)

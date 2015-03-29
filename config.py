@@ -18,7 +18,6 @@ import os
 import sys
 from ConfigParser import SafeConfigParser
 
-
 # edit this name if you rename your config file
 CONFIG_FILE = "config.txt"
 
@@ -46,6 +45,20 @@ def load_config(option):
             raise ValueError("ERROR: Invalid option")
     except IOError:
         print("ERROR: Invalid Config File")
+
+
+# replace this with your keys
+TwitterKey = {
+        'consumer_key': "",
+        'consumer_secret': "",
+        'access_token': "",
+        'access_token_secret': ""
+        }
+
+BitlyKey = {
+        'login': "",
+        'apikey': ""
+        }
 
 
 if __name__ == "__main__":

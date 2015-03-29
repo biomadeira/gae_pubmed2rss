@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Papers et al. API</title>
+</head>
+<body>
+<h3>Implemented Methods:</h3>
+
+<p>* Decodes the inputed string.</br>Example
+<a href="http://api.papersetal.com/search/pubmed/%22PLoS%20One%22[jour]">
+http://api.papersetal.com/search/pubmed/%22PLoS%20One%22[jour]</a></p>
+    <ul>
+        <li>/search/pubmed/&lt;string&gt;</li>
+    </ul>
+<p>* Generates an rss_guid from Pubmed. </br>Example
+<a href="http://api.papersetal.com/rss/pubmed/string=%22PLoS%20One%22[jour]&feeds=20">
+http://api.papersetal.com/rss/pubmed/string=%22PLoS%20One%22[jour]&feeds=20</a></p>
+    <ul>
+        <li>/rss/pubmed/&lt;string&gt;</li>
+        <li>/rss/pubmed/string=&lt;string&gt;</li>
+        <li>/rss/pubmed/&lt;string>&&lt;feeds&gt;</li>
+        <li>/rss/pubmed/&lt;feeds>&&lt;string&gt;</li>
+        <li>/rss/pubmed/string=&lt;string>&feeds=&lt;feeds&gt;</li>
+        <li>/rss/pubmed/feeds=&lt;feeds>&string=&lt;string&gt;</li>
+    </ul>
+<p>* Consumes a Pubmed rss feed (rss_guid) and tweets the new entries.
+    If rss_guid is not provided uses the last one in the db. </br>Example
+<a href="http://api.papersetal.com/twitter_bot&rss_guid=10KSIBP312BFu5ZtZWGihbGEZXh4IK2Q9I44Hvc1UXvWiIeEp5">
+http://api.papersetal.com/twitter_bot&rss_guid=10KSIBP312BFu5ZtZWGihbGEZXh4IK2Q9I44Hvc1UXvWiIeEp5</a></p>
+    <ul>
+        <li>/twitter_bot</li>
+        <li>/twitter_bot&&lt;rss_guid&gt;</li>
+        <li>/twitter_bot&rss_guid=&lt;rss_guid&gt;</li>
+    </ul>
+</body>
+</html>
+

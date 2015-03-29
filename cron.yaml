@@ -1,0 +1,7 @@
+cron:
+- description: twitter bot
+  url: /twitter_bot
+  schedule: every 60 mins
+
+#  schedule: daily 1PM tweet
+#  login: admin
