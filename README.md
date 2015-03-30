@@ -1,4 +1,4 @@
-## Python [Flask](http://flask.pocoo.org) API for Google App Engine
+## API for Papers et al. developed on Python to run on Google App Engine
 
 ## Implemented Methods:
 
