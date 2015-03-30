@@ -3,13 +3,13 @@
 ## Implemented Methods:
 
 #### Decodes the inputed string.  
-Example[http://api.papersetal.com/search/pubmed/%22PLoS%20One%22[jour]](http://api.papersetal.com/search/pubmed/%22PLoS%20One%22[jour])
+Example [http://api.papersetal.com/search/pubmed/%22PLoS%20One%22[jour]](http://api.papersetal.com/search/pubmed/%22PLoS%20One%22[jour])
 
 *   /search/pubmed/&lt;string&gt;
 *   /search/pubmed/string=&lt;string&gt;
 
 #### Generates an rss_guid from Pubmed.  
-Example[http://api.papersetal.com/rss/pubmed/string=%22PLoS%20One%22[jour]&feeds=20](http://api.papersetal.com/rss/pubmed/string=%22PLoS%20One%22[jour]&feeds=20)
+Example [http://api.papersetal.com/rss/pubmed/string=%22PLoS%20One%22[jour]&feeds=20](http://api.papersetal.com/rss/pubmed/string=%22PLoS%20One%22[jour]&feeds=20)
 
 *   /rss/pubmed/&lt;string&gt;
 *   /rss/pubmed/string=&lt;string&gt;
@@ -18,7 +18,7 @@ Example[http://api.papersetal.com/rss/pubmed/string=%22PLoS%20One%22[jour]&feeds
 
 
 #### Consumes a Pubmed rss feed (rss_guid) and tweets the new entries. If rss_guid is not provided uses the last one in the db.  
-Example[http://api.papersetal.com/twitter_bot&rss_guid=10KSIBP312BFu5ZtZWGihbGEZXh4IK2Q9I44Hvc1UXvWiIeEp5](http://api.papersetal.com/twitter_bot&rss_guid=10KSIBP312BFu5ZtZWGihbGEZXh4IK2Q9I44Hvc1UXvWiIeEp5)
+Example [http://api.papersetal.com/twitter_bot&rss_guid=10KSIBP312BFu5ZtZWGihbGEZXh4IK2Q9I44Hvc1UXvWiIeEp5](http://api.papersetal.com/twitter_bot&rss_guid=10KSIBP312BFu5ZtZWGihbGEZXh4IK2Q9I44Hvc1UXvWiIeEp5)
 
 *   /twitter_bot
 *   /twitter_bot&&lt;rss_guid&gt;
