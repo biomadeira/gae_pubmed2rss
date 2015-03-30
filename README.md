@@ -1,6 +1,6 @@
 ## API for Papers et al. developed on Python to run on Google App Engine
 
-## Implemented Methods:
+### Implemented Methods:
 
 #### Decodes the inputed string.  
 Example [http://api.papersetal.com/search/pubmed/%22PLoS%20One%22[jour]](http://api.papersetal.com/search/pubmed/%22PLoS%20One%22[jour])
@@ -27,17 +27,17 @@ Example [http://api.papersetal.com/twitter_bot&rss_guid=10KSIBP312BFu5ZtZWGihbGE
 
 Updated 30/03/2015
 
-## Feedback
+### Feedback
 Star this repo if you found it useful. Use the github issue tracker to give
 feedback on this repo.
 
-## Contributing changes
+### Contributing changes
 See [CONTRIB.md](CONTRIB.md)
 
-## Licensing
+### Licensing
 See [LICENSE](LICENSE)
 
-## Author
-Fábio Madeira
+### Author
+Fábio Madeira, 2015
 
 
