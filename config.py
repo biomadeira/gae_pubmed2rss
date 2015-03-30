@@ -49,7 +49,7 @@ def load_config(option):
 
 # replace this with your keys
 TwitterKey = {
-        'consumer_key': "",
+'consumer_key': "",
         'consumer_secret': "",
         'access_token': "",
         'access_token_secret': ""
@@ -59,7 +59,6 @@ BitlyKey = {
         'login': "",
         'apikey': ""
         }
-
 
 if __name__ == "__main__":
     print("Testing...")

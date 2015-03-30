@@ -1,62 +1,105 @@
-from flask import Flask
-app = Flask(__name__)
-app.config['DEBUG'] = True
+#!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
 
-# Note: We don't need to call run() since our application is embedded within
-# the App Engine WSGI application server.
+"""
+-------
+main.py
+-------
+Main methods (views + routes) implemented in the API.
+.. moduleauthor:: Fabio Madeira
+:module_version: 1.0
+:created_on: 28-02-2015
+"""
 
-from flask import render_template
-
+import webapp2
+import logging
+import os
+import jinja2
 from tools import *
 
-
-@app.route('/')
-def hello():
-    """Renders a simple api doc with the implemented methods."""
-    return render_template("api.html")
-
-
-@app.route('/search/pubmed/<string>')
-def search_pubmed(string):
-    """Return output from Pubmed - based on eutils API."""
-
-    if string:
-
-        return '%s' % string
-    else:
-        page_not_found(404)
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader('templates'),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 
-@app.route('/rss/pubmed/<string>')
-@app.route('/rss/pubmed/string=<string>')
-@app.route('/rss/pubmed/<string>&<feeds>')
-@app.route('/rss/pubmed/<feeds>&<string>')
-@app.route('/rss/pubmed/string=<string>&feeds=<feeds>')
-@app.route('/rss/pubmed/feeds=<feeds>&string=<string>')
-def rss_pubmed(string, feeds=50):
+class MainPage(webapp2.RequestHandler):
+    def get(self):
+        """Renders a simple api doc with the implemented methods."""
+        template = JINJA_ENVIRONMENT.get_template('api.html')
+        self.response.write(template.render())
+
+
+class SearchPubmed(webapp2.RequestHandler):
+    def get(self, string):
+        """Return output from Pubmed - based on eutils API."""
+
+        if string:
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.write('%s' % string)
+        else:
+            self.abort(500)
+
+
+class RssPubmed(webapp2.RequestHandler):
     """Generate a rss feed from Pubmed - based on the main page search."""
 
-    if string:
-        rss_url = generate_rss_from_pubmed(string, feeds=feeds)
-        return '%s' % rss_url
-    else:
-        page_not_found(404)
+    def get(self, string, feeds=50):
+        if string:
+            rss_guid = generate_rss_from_pubmed(string, feeds=feeds)
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.write('%s' % rss_guid)
+        else:
+            self.abort(500)
 
 
-
-@app.route('/twitter_bot')
-@app.route('/twitter_bot&<rss_guid>')
-@app.route('/twitter_bot&rss_guid=<rss_guid>')
-def bot(rss_guid=None):
+class RssBot(webapp2.RequestHandler):
     """
     Consumes a feed and checks if there are new entries in db.
     If so, gets a shortened url and tweets the new status.
     """
 
-    return twitter_bot(rss_guid=rss_guid)
+    def get(self, rss_guid=None):
+        try:
+            twitter_bot(rss_guid=rss_guid)
+
+            self.response.headers['Content-Type'] = 'text/plain'
+            url = "https://twitter.com/papersetal_bot"
+            self.response.write('%s' % url)
+        except:
+            self.abort(500)
 
 
-@app.errorhandler(404)
-def page_not_found(e):
-    """Return a custom 404 error."""
-    return 'Sorry, nothing at this URL.', 404
+def handle_404(request, response, exception):
+    logging.exception(exception)
+    response.write('Sorry, nothing at this URL!')
+    response.set_status(404)
+
+
+def handle_500(request, response, exception):
+    logging.exception(exception)
+    response.write('A server error occurred!')
+    response.set_status(500)
+
+
+debug = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
+
+app = webapp2.WSGIApplication(routes=[
+    webapp2.Route(r'/', handler='main.MainPage', name='home'),
+
+    webapp2.Route(r'/search/pubmed/string=<string:[^/]+>', handler='main.SearchPubmed', name='string'),
+    webapp2.Route(r'/search/pubmed/<string:[^/]+>', handler='main.SearchPubmed', name='string'),
+
+    webapp2.Route(r'/rss/pubmed/string=<string:[^/]+>&feeds=<feeds:[^/]+>', handler='main.RssPubmed', name='string'),
+    webapp2.Route(r'/rss/pubmed/<string:[^/]+>&<feeds:[^/]+>', handler='main.RssPubmed', name='string'),
+    webapp2.Route(r'/rss/pubmed/string=<string:[^/]+>', handler='main.RssPubmed', name='string'),
+    webapp2.Route(r'/rss/pubmed/<string:[^/]+>', handler='main.RssPubmed', name='string'),
+
+    webapp2.Route(r'/twitter_bot&rss_guid=<rss_guid:[^/]+>', handler='main.RssBot', name='rss_guid'),
+    webapp2.Route(r'/twitter_bot&<rss_guid:[^/]+>', handler='main.RssBot', name='rss_guid'),
+    webapp2.Route(r'/twitter_bot', handler='main.RssBot', name='rss_guid'),
+], debug=debug)
+
+app.error_handlers[404] = handle_404
+app.error_handlers[500] = handle_500
+

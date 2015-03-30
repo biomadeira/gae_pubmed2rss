@@ -35,7 +35,7 @@ def request_url(url, list_iter=True, verbose=False):
 
     if req.getcode() == 200:
         return req
-    elif req.getcode() == 429: # or req.getcode() == 503 or req.getcode() == 504:
+    elif req.getcode() == 429:  # or req.getcode() == 503 or req.getcode() == 504:
         request_url(url, list_iter=list_iter, verbose=verbose)
     else:
         # message = "%s\t%s" % (req.getcode()ß, url)
@@ -110,20 +110,19 @@ def twitter_bot(rss_guid=None):
     """
 
     if rss_guid is None:
-        ancestor_key = ndb.Key("RSS_GUID", rss_guid or "*norss*")
-        consumer = FeedConsume.get_last_rss_guid(ancestor_key)
-        rss_guid = consumer[0].rss_guid
+        query = FeedConsume.gql("WHERE entry = :1", "latest")
+        result = query.get()
+        rss_guid = result.rss_guid
     else:
         consumer = FeedConsume(parent=ndb.Key("RSS_GUID", rss_guid or "*norss*"),
-                               rss_guid=rss_guid)
+                               rss_guid=rss_guid, entry="latest")
         consumer.put()
-
     url = "{}erss.cgi?rss_guid={}".format(conf("pubmed_rss"), rss_guid)
     feeds = feedparser.parse(url)
     for feed in feeds["items"]:
         pmid = (feed["link"].split("/")[-1]).rstrip("?dopt=Abstract")
         query = FeedItem.gql("WHERE pmid = :1", pmid)
-         # if pmid not in db
+        # if pmid not in db
         if (query.count() == 0):
             title = feed["title"]
             url = feed["link"]
@@ -152,7 +151,8 @@ def twitter_bot(rss_guid=None):
             auth.set_access_token(TwitterKey['access_token'], TwitterKey['access_token_secret'])
             bot = tweepy.API(auth)
             bot.update_status(status=status)
-    return "Done"
+    return
+
 
 if __name__ == '__main__':
     # testing routines
