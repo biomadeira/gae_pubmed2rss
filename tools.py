@@ -5,7 +5,7 @@
 --------
 tools.py
 --------
-This defines the methods that implement routines used in the api.
+This defines the routines used in the api.
 .. moduleauthor:: Fabio Madeira
 :module_version: 1.0
 :created_on: 28-02-2015
@@ -56,6 +56,24 @@ def post_url(url, data, verbose=False):
         # message = "%s\t%s" % (req.getcode(), url)
         # TODO: add logging
         return 0
+
+
+def shorten_url_bitly(url):
+    """Generic method to shorten a url with Bitly"""
+    conn = bitly_api.Connection(login=None,
+                                api_key=BitlyKey["client_id"],
+                                access_token=BitlyKey["access_token"],
+                                secret=BitlyKey["client_secret"])
+    return conn.shorten(url)["url"]
+
+
+def update_status_twitter(status):
+    """Generic metho to update the status in Twitter"""
+
+    auth = tweepy.OAuthHandler(TwitterKey['consumer_key'], TwitterKey['consumer_secret'])
+    auth.set_access_token(TwitterKey['access_token'], TwitterKey['access_token_secret'])
+    bot = tweepy.API(auth)
+    return bot.update_status(status=status)
 
 
 def generate_rss_from_pubmed(input_string, feeds=50):
@@ -110,6 +128,9 @@ def twitter_bot(rss_guid=None):
     """
 
     if rss_guid is None:
+        # ancestor_key = ndb.Key("RSS_GUID", rss_guid or "*norss*")
+        # consumer = FeedConsume.get_last_rss_guid(ancestor_key)
+        # rss_guid = consumer[0].rss_guid
         query = FeedConsume.gql("WHERE entry = :1", "latest")
         result = query.get()
         rss_guid = result.rss_guid
@@ -132,11 +153,8 @@ def twitter_bot(rss_guid=None):
             item.put()
 
             # shorten the url with Bitly.com
-            conn = bitly_api.Connection(login=None,
-                                        api_key=BitlyKey["client_id"],
-                                        access_token=BitlyKey["access_token"],
-                                        secret=BitlyKey["client_secret"])
-            shorturl = conn.shorten(url)["url"]
+            shorturl = shorten_url_bitly(url)
+
             # tweet the new entry
             max_length = (140 - len(category) - len(shorturl) - 7)
             if len(title) > max_length:
@@ -147,10 +165,9 @@ def twitter_bot(rss_guid=None):
             except UnicodeEncodeError:
                 pass
                 # TODO: add logging
-            auth = tweepy.OAuthHandler(TwitterKey['consumer_key'], TwitterKey['consumer_secret'])
-            auth.set_access_token(TwitterKey['access_token'], TwitterKey['access_token_secret'])
-            bot = tweepy.API(auth)
-            bot.update_status(status=status)
+
+            # tweet new status
+            update_status_twitter(status)
     return
 
 

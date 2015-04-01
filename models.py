@@ -27,7 +27,7 @@ class FeedConsume(ndb.Model):
     date = ndb.DateTimeProperty(auto_now_add=True)
     entry = ndb.StringProperty(required=True)
 
-    @classmethod
-    def get_last_rss_guid(cls, ancestor_key):
-        return cls.query(ancestor=ancestor_key).order(-cls.date)
+    # @classmethod
+    # def get_last_rss_guid(cls, ancestor_key):
+    #     return cls.query(ancestor=ancestor_key).order(-cls.date)
 
