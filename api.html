@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="Fábio Madeira" />
+    <title>BibYAML</title>
+	
+    <!-- Bootstrap -->
+    <link href="style/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<!-- Google Analytics -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-47785591-1', 'bib2yaml.appspot.com');
+	  ga('send', 'pageview');
+
+	</script>
+	<!-- Custom styles for this template -->
+    <link href="style/main.css" rel="stylesheet">
+	<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400" rel="stylesheet" type="text/css">
+	<link href="style/bootstrap.icon-large.min.css" rel="stylesheet">
+  </head>
+<body>
+<!-- Wrap all page content here -->
+<div id="wrap">
+  <!-- Static navbar -->
+<div class="header">
+	<div class="navbar navbar-default navbar-static-top" role="navigation">
+	    <div class="container">
+	      <div class="navbar-header">
+	        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	          <span class="sr-only">Toggle navigation</span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	        </button>
+	      </div><!--/.nav-header -->
+	      <div class="navbar-collapse collapse">
+	        <ul class="nav navbar-nav navbar-right">
+	          <li><a href="http://biomadeira.github.io/">Home</a></li>
+			  <li><a class="fa fa-github"
+                       href="http://www.github.com/biomadeira"></a></li>
+			  <li><a class="fa fa-twitter"
+                       href="http://www.twitter.com/@biomadeira"></a></li>
+	        </ul>
+	      </div><!--/.nav-collapse -->
+	    </div><!--/.container -->
+	  </div><!--/.navbar-default -->
+</div><!-- /.header -->
+<div class="container">
+<h2>Pubmed Rss id Generator and Twitter bot </h2>
+
+<!-- <p>* Decodes the inputed string.</br>Example
+<a href="{{ baseurl }}/search/pubmed/{{ default_search }}">
+    {{ baseurl }}/search/pubmed/{{ default_search }}</a></p>
+    <ul>
+        <li>/search/pubmed/&lt;string&gt;</li>
+        <li>/search/pubmed/string=&lt;string&gt;</li>
+    </ul>
+<form action="/search" method="post">
+  <input type="text" size="40" name="search" value="{{ default_search }}">
+  <input type="submit" value="Submit">
+</form> -->
+<!--<p><span>{{ search_output }}</span></p>-->
+<div class="jumbotron">
+<h3>Gets an rss id from Pubmed search engine</h3>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8" style="text-align: left">
+
+        <p>Endpoints:</p>
+        <ul>
+            <li>/rss/pubmed/&lt;string&gt;</li>
+            <li>/rss/pubmed/string=&lt;string&gt;</li>
+            <li>/rss/pubmed/&lt;string>&&lt;feeds&gt;</li>
+            <li>/rss/pubmed/string=&lt;string>&feeds=&lt;feeds&gt;</li>
+        </ul>
+        <p>Example: <a href="{{ baseurl }}/rss/pubmed/string={{ default_search }}&feeds={{ default_feeds }}" style="font-size: 16px">
+            {{ baseurl }}/rss/pubmed/string={{ default_search }}&feeds={{ default_feeds }}</a></p>
+        </br><p>
+            <form action="/rss" method="post">
+                <input type="text" size="40" name="search" value="{{ default_search }}">
+                <input type="text" size="10" name="feeds" value="{{ default_feeds }}">
+                <input type="submit" value="Submit">
+            </form>
+            </p>
+            {% if rssguid_output %}
+                <div class="alert alert-info" role="alert"><strong>Rss id:</strong> {{ rssguid_output }}</div>
+                <span><strong>Pubmed Rss @</strong><a href="http://www.ncbi.nlm.nih.gov/entrez/eutils/erss.cgi?rss_guid=1h9kEWSfxImUd3q0TuDX7eLhEJoM4-k3pB8scCPrUmcSn3lkLl">
+                    http://www.ncbi.nlm.nih.gov/entrez/eutils/erss.cgi?rss_guid=1h9kEWSfxImUd3q0TuDX7eLhEJoM4-k3pB8scCPrUmcSn3lkLl</a>
+                    </span>
+            {% endif %}
+    </div>
+    <div class="col-md-2"></div>
+</div>
+</div>
+<div class="jumbotron">
+<h3> Consumes a Pubmed feed and tweets the new entries</h3>
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10" style="text-align: left">
+
+            <p>Endpoints:</p>
+            <ul>
+                <li>/twitter_bot (updates the last rss id available in the db)</li>
+                <li>/twitter_bot&&lt;rss_guid&gt;</li>
+                <li>/twitter_bot&rss_guid=&lt;rss_guid&gt;</li>
+            </ul>
+            <p>Example: <a href="{{ baseurl }}/twitter_bot&rss_guid={{ default_rssguid }}" style="font-size: 16px">
+                {{ baseurl }}/twitter_bot&rss_guid={{ default_rssguid }}</a></p>
+            </br><p>
+            <form action="/twitter" method="post">
+                <input type="text" size="70" name="rssguid" value="{{ default_rssguid }}">
+                <input type="submit" value="Submit">
+            </form>
+            </p>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+</div>
+</div>
+<!-- FOOTER -->
+<div id="footer">
+    <div class="container">
+      <p class="text-muted">
+		  Designed by  
+		  		  <a href='http://biomadeira.github.io/' class="nounderline">Fábio Madeira</a> and proudly
+		  hosted in 
+		  <a href='https://cloud.google.com/appengine/' class="nounderline">Google App Engine</a>.</br> 
+		  Contents under the
+<a href='http://creativecommons.org/licenses/by-sa/3.0/deed.en_US'>CC
+BY-SA 3.0</a> licence.</p>
+    </div><!-- /.container -->
+</div><!-- /.footer -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="style/bootstrap.min.js"></script>
+	<script src="style/docs.min.js"></script>
+</body>
+</html>

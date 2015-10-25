@@ -139,27 +139,33 @@ def twitter_bot(rss_guid=None):
                                rss_guid=rss_guid, entry="latest")
         consumer.put()
     url = "{}erss.cgi?rss_guid={}".format(conf("pubmed_rss"), rss_guid)
+    print(url)
     feeds = feedparser.parse(url)
+    tweets = []
     for feed in feeds["items"]:
         pmid = (feed["link"].split("/")[-1]).rstrip("?dopt=Abstract")
+        if "entrez?" in pmid:
+            continue
         query = FeedItem.gql("WHERE pmid = :1", pmid)
         # if pmid not in db
         if (query.count() == 0):
             title = feed["title"]
+            otitle = title
             url = feed["link"]
             category = feed["category"]
             item = FeedItem()
             item.pmid = pmid
-            item.put()
-
+        
             # shorten the url with Bitly.com
             shorturl = shorten_url_bitly(url)
 
             # tweet the new entry
             max_length = (140 - len(category) - len(shorturl) - 7)
+            print(max_length)
             if len(title) > max_length:
                 title = title[0:max_length]
-            status = "#{}: {}... {}".format("".join(category.split()), title.rstrip("."), shorturl)
+            status = "#{}: {}... {}".format("".join(category.split()), title.rstrip(". "), shorturl)
+            print(max_length, len(status))
             try:
                 status = unicode(status).encode("utf-8")
             except UnicodeEncodeError:
@@ -167,8 +173,16 @@ def twitter_bot(rss_guid=None):
                 # TODO: add logging
 
             # tweet new status
-            update_status_twitter(status)
-    return
+            # tweets.append({'title': "{}...".format(title.rstrip(". ")), 'url': shorturl})
+            ttitle = "#{}: {}...".format("".join(category.split()), otitle[0:100].rstrip(". "))
+            tweets.append({'title': ttitle, 'url': shorturl})
+            try:
+                update_status_twitter(status)
+                item.put()
+            except:
+                pass
+            
+    return tweets
 
 
 if __name__ == '__main__':
