@@ -139,7 +139,6 @@ def twitter_bot(rss_guid=None):
                                rss_guid=rss_guid, entry="latest")
         consumer.put()
     url = "{}erss.cgi?rss_guid={}".format(conf("pubmed_rss"), rss_guid)
-    print(url)
     feeds = feedparser.parse(url)
     tweets = []
     for feed in feeds["items"]:
@@ -165,7 +164,6 @@ def twitter_bot(rss_guid=None):
             if len(title) > max_length:
                 title = title[0:max_length]
             status = "#{}: {}... {}".format("".join(category.split()), title.rstrip(". "), shorturl)
-            print(max_length, len(status))
             try:
                 status = unicode(status).encode("utf-8")
             except UnicodeEncodeError:

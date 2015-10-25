@@ -48,29 +48,17 @@ def load_config(option):
 
 
 # replace this with your keys
-# TwitterKey = {
-# 'consumer_key': "",
-#         'consumer_secret': "",
-#         'access_token': "",
-#         'access_token_secret': ""
-#         }
-#
-# BitlyKey = {
-#         'login': "",
-#         'apikey': ""
-#         }
 TwitterKey = {
-    'consumer_key': "RlbAgjvY1f9dGSvle0BYpBodR",
-    'consumer_secret': "eD0MKBwPSNvHIpkZ9iM29sYhQLzzD3y462wXft5qylK5Ke4QmN",
-    'access_token': "3126293415-sKlyEYcNZbRSHXOsH39umr81R8ROo4xbuL01rut",
-    'access_token_secret': "QjHoBO9P1edWIcKT9ywXMJPLRLgNrFnivp53IvkArcDTI"
-}
+'consumer_key': "",
+        'consumer_secret': "",
+        'access_token': "",
+        'access_token_secret': ""
+        }
 
 BitlyKey = {
-    'access_token': "d151a4ee794bfe72ff8b649cee7467b4fcf054f1",
-    'client_id': "7b30000799bdc03f3a68eed3b27ec1229e04740b",
-    'client_secret': "351800b58b3251bc326d3805691ada2e0ecdd5e5"
-}
+        'login': "",
+        'apikey': ""
+        }
 
 if __name__ == "__main__":
     print("Testing...")
